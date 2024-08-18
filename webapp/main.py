@@ -18,11 +18,19 @@ async def get():
 
 @app.websocket("/ws/{client_id}")
 async def websocket_endpoint(websocket: WebSocket, client_id: int):
-    await manager.connect(websocket)
+    await manager.connect(client_id, websocket)
     try:
         while True:
             data = await websocket.receive_text()
-            await manager.broadcast(f"Client #{client_id} says: {data}")
+            if name := manager.get_client_name(client_id):
+                await manager.broadcast(f"{name}: {data}")
+            else:
+                if data:
+                    manager.set_client_name(client_id, data)
+                    await websocket.send_text(f"Your name is {data}")
+                else:
+                    await websocket.send_text("Invalid name")
     except WebSocketDisconnect:
-        manager.disconnect(websocket)
-        await manager.broadcast(f"Client #{client_id} left the chat")
+        name = manager.get_client_name(client_id)
+        manager.disconnect(client_id)
+        await manager.broadcast(f"{name if name else client_id} left the chat")

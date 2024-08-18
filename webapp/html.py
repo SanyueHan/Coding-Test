@@ -41,7 +41,7 @@ HTML_MULTI_CLIENT = """
     </head>
     <body>
         <h1>WebSocket Chat</h1>
-        <h2>Your ID: <span id="ws-id"></span></h2>
+        <h2>Please input your name before chatting</h2>
         <form action="" onsubmit="sendMessage(event)">
             <input type="text" id="messageText" autocomplete="off"/>
             <button>Send</button>
@@ -50,7 +50,6 @@ HTML_MULTI_CLIENT = """
         </ul>
         <script>
             var client_id = Date.now()
-            document.querySelector("#ws-id").textContent = client_id;
             var ws = new WebSocket(`ws://localhost:8000/ws/${client_id}`);
             ws.onmessage = function(event) {
                 var messages = document.getElementById('messages')
